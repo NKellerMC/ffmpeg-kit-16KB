@@ -20,8 +20,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install NDK
-        run: sdkmanager "ndk;25.2.9519653"
+      - name: Install Android NDK
+        run: |
+          sdkmanager "ndk;25.2.9519653"
 
       - name: Build FFmpegKit
         env:
@@ -29,7 +30,15 @@ jobs:
           ANDROID_NDK_ROOT: ${{ env.ANDROID_HOME }}/ndk/25.2.9519653
         run: |
           chmod +x android.sh
-          ./android.sh --disable-arm-v7a --disable-x86 --disable-x86-64
+          ./android.sh \
+            --disable-arm-v7a \
+            --disable-arm-v7a-neon \
+            --disable-x86 \
+            --disable-x86-64
+
+      - name: Find AAR
+        run: |
+          find . -name "*.aar"
 
       - name: Upload AAR
         uses: actions/upload-artifact@v4
