@@ -1,0 +1,39 @@
+name: Build FFmpegKit Android AAR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;25.2.9519653"
+
+      - name: Build FFmpegKit
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+          ANDROID_NDK_ROOT: ${{ env.ANDROID_HOME }}/ndk/25.2.9519653
+        run: |
+          chmod +x android.sh
+          ./android.sh --disable-arm-v7a --disable-x86 --disable-x86-64
+
+      - name: Upload AAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpegkit-aar
+          path: |
+            **/*.aar
